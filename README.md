@@ -25,5 +25,5 @@ The goal of this project is to implement a simple web crawler using python
                   Disallow: /home/fceria01/
 
     5. Use a five-second delay between requests.
-    6. Crawl until you have 100 unique links. You do not need to keep the page contents.
+    6. Crawl until you reach the depth of 2. You do not need to keep the page contents.
 
