@@ -1,0 +1,3 @@
+command to run the program is 
+
+python webCrawler.py <url name> <keyphrase>
