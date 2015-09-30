@@ -7,26 +7,23 @@ import codecs
 import urlparse
 import time
 from Queue import Queue, Empty as QueueEmpty
-
 from bs4 import BeautifulSoup
 
+#connect to url using urllib module
 def connectWeb(url):
-
 	user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 	values = {'name':'Vardhaman', 'location':'Melrose', 'language':'Python'}
 	headers = {'User-Agent': user_agent}
 	data = urllib.urlencode(values)
-
 	req = urllib2.Request(url,data,headers)
 	try:
 	   status = urllib2.urlopen(req)
 	except urllib2.URLError as e:
 		print e.reason
 	UrlafterConnect = status.read()
-
 	return UrlafterConnect
 
-#Crawl and return t he list of webpages referenced in the links of the page for no keyphrase
+#Crawl and return the list of webpages referenced in the links of the page for no keyphrase
 def crawlWeb_no_keyword(UrlafterConnect):
 
 	if not UrlafterConnect:
@@ -47,7 +44,6 @@ def crawlWeb_no_keyword(UrlafterConnect):
 				crawl_url = urlparse.urljoin("http://en.wikipedia.org",crawl_url)
 				crawl_url, frag = urlparse.urldefrag(crawl_url)
 				urllist.append(crawl_url)
-
 		else:
 			#Get only wiki links without colons in it and not redirecting to main page
 			if crawl_url.startswith('http://en.wikipedia.org'):
@@ -60,8 +56,8 @@ def crawlWeb_no_keyword(UrlafterConnect):
 	#Remove duplicate entries from the list while returning
 	return list(set(urllist))
 
+#crawl method
 def crawlWeb(UrlafterConnect,keyword):
-
 	if not UrlafterConnect:
 		print("Url is empty")
 		return list()
@@ -75,23 +71,19 @@ def crawlWeb(UrlafterConnect,keyword):
 			crawl_url = crawl.encode('utf-8')
 			if not crawl_url:
 				continue
-
 		#links present in the same directory of /wiki, if so convert them to http form
 			if crawl_url.startswith('/wiki'):
 				if (crawl_url.find(':') == -1) and (crawl_url != "/wiki/Main_Page"):
 					crawl_url = urlparse.urljoin("http://en.wikipedia.org",crawl_url)
 					crawl_url, frag = urlparse.urldefrag(crawl_url)
 					urllist.append(crawl_url)
-
 			else:
 			#Get only wiki links without colons in it and not redirecting to main page
 				if crawl_url.startswith('http://en.wikipedia.org'):
 					if crawl_url != "http://en.wikipedia.org/wiki/Main_Page":
-
 						s = "http://en"
 						crawl = crawl_url.lstrip("http://en")
 						if crawl.find(':') == -1:
-
 							crawl_url, frag = urlparse.urldefrag(crawl_url)
 							urllist.append(crawl_url)
 	#Remove duplicate entries from the list while returning
@@ -105,7 +97,6 @@ def main(argv):
 	UrlafterConnect = connectWeb(url)
 	if argumen == 2:
 		url_queue = crawlWeb_no_keyword(UrlafterConnect)
-
 		f = open("./CrawledLinks_no_keyword.txt",'w')
 		for link in url_queue:
 			f.write(link.encode('utf-8'))
@@ -117,12 +108,10 @@ def main(argv):
 		url_queue = crawlWeb(UrlafterConnect,keyword)
 		#crawled_urls.extend(url_queue)
 		count = 1
-
 	#Since we need the depth as 3, crawl twice from the seed page
 		while(count <=2):
 			print count
 			iter_list = []
-
 			for link in url_queue:
 				if crawled_urls.count(link) > 1:
 				   # print "Duplicate URL, not crawling again"
@@ -134,7 +123,6 @@ def main(argv):
 						continue
 					temp_list = crawlWeb(webpage,keyword)
 					crawled_urls.append(link)
-
 					iter_list.extend(temp_list)
 			url_queue = list(iter_list)
 			count = count + 1
@@ -144,6 +132,5 @@ def main(argv):
 		f.write(link.decode('utf-8'))
 			f.write("\n")
 		f.close()
-
 if __name__ == "__main__":
    main(sys.argv)
